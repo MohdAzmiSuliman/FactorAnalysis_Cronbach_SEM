@@ -90,5 +90,13 @@ dsfa2 <- fa(subset(analds1, select = -c(Q19A, Q20A)), nfactors = 3, fm = "pa", r
 ```
 
 
+# Cronbach Alpha
+
+```{r}
+stressfactor <- analds1 %>% select(Q1S, Q6S, Q8S, Q11S, Q12S, Q14S, Q18S)
+alpha_stressfactor <- alpha(stressfactor) %>% print(digit = 3)
+```
+
+
 
 
