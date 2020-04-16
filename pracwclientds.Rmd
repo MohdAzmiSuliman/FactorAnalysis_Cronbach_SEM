@@ -1,0 +1,94 @@
+---
+title: "Client Dataset"
+author: "Mohd Azmi"
+date: "16/04/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Environment
+
+## Library
+
+```{r}
+library(pacman)
+p_load(tidyverse, haven, psych, lattice, GPArotation)
+```
+## Dataset 
+
+```{r}
+analds0 <- read_sav("workds110420.sav")
+analds <- analds0 %>%
+  select(Q1S, Q2A, Q3D, Q4A, Q5D, Q6S, Q7A, Q8S, Q9A, Q10D, Q11S, Q12S, Q13D, Q14S, Q15A, Q16D, Q17D, Q18S,Q19A, Q20A, Q21D) %>%
+  print()
+analds1 <- analds %>% select(-Q21D) %>% print()
+```
+
+# Analysis
+
+## Exploratory
+
+```{r}
+histogram(~ Q1S + Q2A + Q3D + Q4A + Q5D + Q6S + Q7A + Q8S + Q9A + Q10D + Q11S + Q12S + Q13D + Q14S + Q15A + Q16D + Q17D + Q18S + Q19A + Q20A, data = analds1)
+```
+
+```{r}
+mardia(analds1)
+```
+
+## Step 1
+
+```{r}
+KMO(analds1)
+```
+
+```{r}
+cortest.bartlett(analds1)
+```
+
+cattell's scree test
+
+```{r}
+screeplot <- scree(analds1) %>% print()
+```
+
+paralel analysis
+
+```{r}
+plotparalelds <- fa.parallel(analds1, fm = "pa", fa = "fa") %>% print()
+```
+
+VSS
+
+```{r}
+plotvssds <- vss(analds1) %>% print()
+```
+
+
+## Step 2
+
+```{r}
+dsfa <- fa(analds1, nfactors = 3, fm = "pa", rotate = "oblimin") %>% print(cut = .3, digits = 3)
+```
+
+
+## Step 3
+
+remove q19 - low fl
+
+```{r}
+dsfa1 <- fa(subset(analds1, select = -Q19A), nfactors = 3, fm = "pa", rotate = "oblimin") %>% print(cut = .3, digits = 3)
+```
+
+remove q20 - low fl
+
+```{r}
+dsfa2 <- fa(subset(analds1, select = -c(Q19A, Q20A)), nfactors = 3, fm = "pa", rotate = "oblimin") %>% print(cut = .3, digits = 3)
+```
+
+
+
+
