@@ -1,0 +1,237 @@
+---
+title: "Factor Analysis Practical"
+author: "Mohd Azmi"
+date: "25/03/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Prelim - EFA
+
+## Libraries
+
+```{r}
+library(pacman)
+p_load(haven, tidyverse, psych, lattice, summarytools, broom)
+```
+
+## Dataset
+
+```{r}
+myds0 <- read_sav("Attitude_Statistics v3.sav") %>% #import
+  zap_labels() %>%  #removed spss label
+  select(-ID) #removed ID
+myds0
+```
+
+# Analysis - EFA
+
+## Descriptive & Exploration
+
+```{r}
+myds0 %>% descr()
+```
+
+## Normality
+
+### Histogram
+
+```{r}
+ggplot(gather(myds0), aes(x=value, y=(..count../sum(..count..))*1000)) +
+  geom_bar() + ylab("Percent") + xlab("Score") +
+  facet_wrap(~key)
+```
+
+### Shapiro Wilk Test
+
+```{r}
+mapply(shapiro.test, myds0)
+```
+
+### Multivariate Normality
+
+```{r}
+mardia(myds0)
+```
+
+## Step1
+
+### KMO MSA
+
+```{r}
+KMO(myds0)
+```
+
+### Bartlet Test of sphericity
+
+```{r}
+cortest.bartlett(myds0)
+```
+
+### Eigenvalues and scree plot
+
+```{r}
+scree_plot0 <- scree(myds0)
+scree_plot0
+```
+
+### Parallel Analysis
+
+```{r}
+parallel_myds0 <- fa.parallel(myds0, fm = "pa", fa = "fa")
+parallel_myds0
+```
+
+### VSS
+
+```{r}
+vss(myds0)
+```
+
+## Step 2
+
+### EFA
+
+```{r}
+efa_myds0 <- fa(myds0, nfactors = 2, fm = "pa", rotate = "oblimin")
+print(efa_myds0, cut = .3, digits = 3)
+```
+
+```{r}
+print(efa_myds0, digits = 3)
+```
+
+## Step 3
+
+### remove Q1
+
+```{r}
+efa_myds_m1 <- fa(subset(myds0, select = -Q1), nfactors = 2, fm = "pa", rotate = "oblimin")
+print(efa_myds_m1, cut = .3, digits = 3)
+```
+
+### remove Q12
+
+```{r}
+efa_myds_m2 <- fa(subset(myds0, select = -c(Q1,Q12)), nfactors = 2, fm = "pa", rotate = "oblimin")
+print(efa_myds_m2, cut = .3, digits = 3)
+```
+
+### Remove Q2
+
+```{r}
+efa_myds_m3 <- fa(subset(myds0, select = -c(Q1,Q3, Q12)), nfactors = 2, fm = "pa", rotate = "oblimin")
+print(efa_myds_m3, cut = .3, digits = 3)
+```
+
+### Remove Q3
+
+```{r}
+efa_myds_m4 <- fa(subset(myds0, select = -c(Q1,Q2, Q3, Q12)), nfactors = 2, fm = "pa", rotate = "oblimin")
+print(efa_myds_m4, cut = .3, digits = 3)
+```
+
+## Summary
+
+1. PA1: Q4, Q5, Q6, Q7, Q11
+2. PA2: Q8, Q9, Q10
+
+## Cronbach Alpha - Internal Consistency Reliability
+
+```{r}
+PA1 <- c("Q4", "Q5", "Q6", "Q7", "Q11")
+PA2 <- c("Q8", "Q9", "Q10")
+```
+
+
+### PA1
+
+```{r}
+ca_PA1 <- alpha(myds0[PA1])
+print(ca_PA1, digits = 3)
+```
+
+
+### PA2
+
+```{r}
+ca_PA2 <- alpha(myds0[PA2])
+print(ca_PA2, digits = 3)
+```
+
+
+# Prelim - CFA
+
+## Libraries
+
+```{r}
+p_load(lavaan, semTools, semPlot)
+```
+
+## Dataset
+
+take 
+
+1. PA1: Q4, Q5, Q6, Q7, Q11
+2. PA2: Q8, Q9, Q10
+
+```{r}
+mydsCFA0 <- myds0 %>% select("Q4", "Q5", "Q6", "Q7", "Q11", "Q8", "Q9", "Q10")
+mydsCFA0
+```
+
+# Analysis - CFA
+
+## Descriptive & Exploratory
+
+### Descriptive
+
+```{r}
+mydsCFA0 %>% descr()
+```
+
+### Normality
+
+```{r}
+mardia(mydsCFA0)
+```
+
+## Step 1 - Specify Measurement Model
+
+```{r}
+model <- "
+PA1 =~ Q4 + Q5 + Q6 + Q7 + Q11
+PA2 =~ Q8 + Q9 + Q10
+"
+```
+
+## Step 2 - Fit the model
+
+```{r}
+cfa_mod0 <- cfa(model, data = mydsCFA0, estimator = "MLR")
+summary(cfa_mod0, fit.measures = T, standardized = T)
+```
+
+```{r}
+standardizedSolution(cfa_mod0)
+```
+
+```{r}
+mod_index_cfamod0 <- modificationIndices(cfa_mod0)
+subset(mod_index_cfamod0, mod_index_cfamod0 > 3.84)
+```
+
+```{r}
+stdresid_cfamod0 <- residuals(cfa_mod0, type = "standardized")
+stdresid_cfamod0
+```
+
+# SEM Path
+
+```{r}
+semPaths(cfa_mod0, "path", "std", style = "lisrel")
+```
+
