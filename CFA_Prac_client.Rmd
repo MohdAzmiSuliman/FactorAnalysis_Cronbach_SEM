@@ -1,0 +1,91 @@
+---
+title: "Confirmatory Factor Analysis"
+author: "Mohd Azmi"
+date: "18/04/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Environment
+
+## Library
+
+```{r}
+library(pacman)
+p_load(tidyverse, haven, summarytools, psych, MVN, lavaan, semTools, semPlot)
+```
+
+
+## Dataset
+
+```{r}
+analds0 <- read_sav("workds110420.sav")
+analds <- analds0 %>% mutate_if(is.labelled, ~(as_factor(.))) %>% print()
+analds_num <- analds %>% select_if(is.numeric) %>% print()
+```
+
+# ANalysis
+
+## Exploration
+
+```{r}
+descr(analds_num)
+```
+
+
+## Step 2: Normality
+
+```{r}
+analds_score <- analds_num %>% select(-No, -Age, -Q21D, -Total_DS, -Total_AS, -Total_SS, -Total_DS2, -Total_AS2, -Total_SS2) %>% print()
+
+mardia_score <- mvn(analds_score, mvnTest = "mardia", multivariatePlot = "qq") %>% print()
+```
+
+
+## Step 3 - Specify the measurement model
+
+```{r}
+model1 <- "
+depression =~ Q3D + Q5D + Q10D + Q13D + Q16D + Q17D
+anxiety =~ Q2A + Q4A + Q7A + Q9A + Q15A + Q19A + Q20A
+stress =~ Q1S + Q6S + Q8S + Q11S + Q12S + Q14S + Q18S
+"
+
+cfa_model1 <- cfa(model1, data=analds_score, estimator = "MLR")
+summary(cfa_model1, fit.measures = T, standardized = T)
+```
+
+
+## Step 4 - Assessing Measurement Model Validity
+
+Standardized factor loading - refer latent variables in above, or refer sem plot below
+
+```{r}
+sr_model1 <- residuals(cfa_model1, type = "Standardized") %>% print()
+mi_model1 <- modificationIndices(cfa_model1)
+mi_model1
+#subset(mi_model1, mi.scaled > 3.84)
+```
+
+
+## Step 5 - Composite Reliability
+
+```{r}
+reliability(cfa_model1)
+reliability(cfa_model1)[2,]
+```
+
+read on omega reading
+
+composite reliability : `r reliability(cfa_model1)[2,]`
+
+## Plot
+
+```{r}
+semPaths(cfa_model1, what = "path", whatLabels = "std", style = "lisrel", edge.color = "black", intercepts = F)
+```
+
+
