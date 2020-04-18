@@ -1,0 +1,99 @@
+---
+title: "Confirmatory Factor Analysis"
+author: "Mohd Azmi"
+date: "18/04/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Environment
+
+## Library
+
+```{r}
+library(pacman)
+p_load(tidyverse, haven, summarytools, psych, MVN, lavaan, semTools, semPlot)
+```
+
+
+## Dataset
+
+```{r}
+analds0 <- read_sav("exercise motivation.sav")
+analds <- analds0 %>% mutate_if(is.labelled, ~(as_factor(.))) %>% print()
+```
+
+# ANalysis
+
+## Exploration
+
+```{r}
+descr(analds)
+```
+
+
+## Step 2: Normality
+
+```{r}
+analds_score <- analds %>% select(-ID, -gender) %>% print()
+
+mardia_score <- mvn(analds_score, mvnTest = "mardia", multivariatePlot = "qq") %>% print()
+```
+
+
+## Step 3 - Specify the measurement model
+
+```{r}
+model1 = "
+mastery =~ M1 + M2 + M3 + M4
+enjoy =~ E1 + E2 +E3"
+
+cfa_model1 <- cfa(model1, data=analds_score, estimator = "MLR")
+summary(cfa_model1, fit.measures = T, standardized = T)
+```
+
+CFI = 0.984
+- read at robust column
+
+TLI = 0.975
+
+SRMR = 0.049
+
+RMSEA = 0.050
+(90% CI) = 0.000, 0.086
+CIfit = 0.456
+
+
+## Step 4 - Assessing Measurement Model Validity
+
+Standardized factor loading - refer latent variables in above, or refer sem plot below
+
+```{r}
+sr_model1 <- residuals(cfa_model1, type = "Standardized") %>% print()
+mi_model1 <- modificationIndices(cfa_model1)
+mi_model1
+#subset(mi_model1, mi.scaled > 3.84)
+```
+
+
+## Step 5 - Composite Reliability
+
+```{r}
+reliability(cfa_model1)
+reliability(cfa_model1)[2,]
+```
+
+read on omega reading
+
+composite reliability : `r reliability(cfa_model1)[2,]`
+
+## Plot
+
+```{r}
+semPaths(cfa_model1, what = "path", whatLabels = "std", style = "lisrel", edge.color = "black", intercepts = F)
+```
+
+
