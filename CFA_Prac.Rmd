@@ -26,9 +26,9 @@ analds0 <- read_sav("exercise motivation.sav")
 analds <- analds0 %>% mutate_if(is.labelled, ~(as_factor(.))) %>% print()
 ```
 
-# ANalysis
+# Analysis
 
-## Exploration
+## Step 1: Exploration
 
 ```{r}
 descr(analds)
@@ -41,6 +41,8 @@ descr(analds)
 analds_score <- analds %>% select(-ID, -gender) %>% print()
 
 mardia_score <- mvn(analds_score, mvnTest = "mardia", multivariatePlot = "qq") %>% print()
+
+mardia(analds_score, plot = T)
 ```
 
 
@@ -69,7 +71,7 @@ CIfit = 0.456
 
 ## Step 4 - Assessing Measurement Model Validity
 
-Standardized factor loading - refer latent variables in above, or refer sem plot below
+Standardized factor loading - refer latent variables in above - see column std. all, or refer sem plot below
 
 ```{r}
 sr_model1 <- residuals(cfa_model1, type = "Standardized") %>% print()
