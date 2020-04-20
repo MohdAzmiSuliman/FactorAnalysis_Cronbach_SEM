@@ -51,7 +51,9 @@ mardia(analds_score, plot = T)
 ```{r}
 model1 = "
 mastery =~ M1 + M2 + M3 + M4
-enjoy =~ E1 + E2 +E3"
+enjoy =~ E1 + E2 + E3
+E1 ~~ E3
+"
 
 cfa_model1 <- cfa(model1, data=analds_score, estimator = "MLR")
 summary(cfa_model1, fit.measures = T, standardized = T)
@@ -76,7 +78,7 @@ Standardized factor loading - refer latent variables in above - see column std. 
 ```{r}
 sr_model1 <- residuals(cfa_model1, type = "Standardized") %>% print()
 mi_model1 <- modificationIndices(cfa_model1)
-mi_model1
+subset(mi_model1, mi > 3.84)
 #subset(mi_model1, mi.scaled > 3.84)
 ```
 
