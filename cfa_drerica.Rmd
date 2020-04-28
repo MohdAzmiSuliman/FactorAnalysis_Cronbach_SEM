@@ -1,0 +1,134 @@
+---
+title: "EFA with Dr Erica"
+author: "Mohd Azmi"
+date: "28/04/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Environment
+
+## Library
+
+```{r}
+library(pacman)
+p_load(haven, psych, MVN, lavaan, semTools, semPlot, tidyverse, MBESS)
+```
+
+## Dataset
+
+```{r}
+drericads0 <- read_sav("motivationCFA.sav")
+drericads <- drericads0 %>% mutate_if(is.labelled, ~(as_factor(.)))
+drericads
+cfads <- drericads %>% select(M1, M2, M3, E1, E2, E3)
+cfads
+```
+
+# Analysis
+
+## Descriptive
+
+```{r}
+describe(cfads)
+```
+
+## Multivariate Normality
+
+```{r}
+mardia(cfads)
+```
+
+
+## Model Specification
+
+```{r}
+cfamodel_spec <- "
+mastery =~ M1 + M2 + M3
+enjoy =~ E1 + E2 + E3
+"
+```
+
+## CFA Analysis
+
+```{r}
+cfamodel1 <- cfa(cfamodel_spec, data = cfads, estimator = "MLR")
+summary(cfamodel1, fit.measures = T, standardized = T)
+```
+
+## Residual
+
+```{r}
+cfamodel1sr <- residuals(cfamodel1, type = "standardized.mplus")
+cfamodel1sr
+```
+
+## Modification index
+
+```{r}
+cfamodel1mi <- modificationIndices(cfamodel1)
+subset(cfamodel1mi, mi > 3.84)
+```
+
+## Model Re-specification
+
+```{r}
+cfamodel2_spec <- "
+mastery =~ M1 + M2 + M3
+enjoy =~ E1 + E2 + E3
+E1 ~~ E3
+"
+```
+
+### CFA Analysis
+
+```{r}
+cfamodel2 <- cfa(cfamodel2_spec, data = cfads, estimator = "MLR")
+summary(cfamodel2, fit.measures = T, standardized = T)
+```
+
+### Residual
+
+```{r}
+cfamodel2sr <- residuals(cfamodel2, type = "standardized.mplus")
+cfamodel2sr
+```
+
+### Modification index
+
+```{r}
+cfamodel2mi <- modificationIndices(cfamodel2)
+subset(cfamodel2mi, mi > 3.84)
+```
+
+## Reliability
+
+```{r}
+reliability(cfamodel1)
+```
+
+### CI for Mastery
+
+```{r}
+cfamodel1_sampstat <- lavInspect(cfamodel1, "sampstat")$cov
+cfamodel1_sampstat_mastery <- cfamodel1_sampstat[c("M1", "M2", "M3"), c("M1", "M2", "M3")]
+cfamodel1_nobs <- lavInspect(cfamodel1, "nobs")
+ci.reliability(S = cfamodel1_sampstat_mastery, N = cfamodel1_nobs, type = "omega")
+```
+
+### CI for Enjoy
+
+```{r}
+cfamodel1_sampstat_enjoy <- cfamodel1_sampstat[c("E1", "E2", "E3"), c("E1", "E2", "E3")]
+ci.reliability(S = cfamodel1_sampstat_enjoy, N = cfamodel1_nobs, type = "omega")
+```
+
+# CFA Plot
+
+```{r}
+semPaths(cfamodel1, what = "path", whatLabels = "std", style = "lisrel", edge.color = "black")
+```
+
