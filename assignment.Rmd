@@ -1,0 +1,86 @@
+---
+title: "Assignment"
+author: "Mohd Azmi"
+date: "30/04/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Environment
+
+## Library
+
+```{r}
+library(pacman)
+p_load(haven, psych, MVN, lattice, summarytools, broom, GPArotation, tidyverse)
+```
+
+## Dataset
+
+```{r}
+selfds0 <- read_sav("self-efficacy.sav")
+selfds <- selfds0 %>% select(-ID) #%>% mutate_if(is.labelled, ~(as_factor(.)))
+selfds
+```
+
+# Analysis
+
+## Step 1 - RQ & Hypothesis
+
+## Step 2 - Exploration
+
+```{r}
+corPlot(selfds)
+```
+
+
+### Multivariate Normality
+
+```{r}
+mardia(selfds)
+```
+
+
+## Step 3 - Explore factors or domain
+
+### KMO MSA
+
+```{r}
+KMO(selfds)
+```
+
+### Bartlet
+
+```{r}
+cortest.bartlett(selfds)
+```
+
+### Eigenvalue and scree plot
+
+```{r}
+self_scree <- scree(selfds) %>% print()
+```
+
+### Other
+
+```{r}
+self_faparallel <- fa.parallel(selfds, fm = "pa", fa = "fa") %>% print()
+vss(selfds)
+```
+
+# Step 4 - fix no of factor
+
+```{r}
+self_efa1 <- fa(selfds, nfactor = 1, fm = "pa", rotate = "oblimin") %>% print(digits = 3)
+```
+
+# Crobach Alpha
+
+```{r}
+self_ca <- psych::alpha(selfds) 
+self_ca
+```
+
