@@ -1,0 +1,111 @@
+---
+title: "efa dr erica"
+author: "Mohd Azmi"
+date: "30/04/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Environment
+
+## Library
+
+```{r}
+library(pacman)
+p_load(haven, tidyverse, psych, lattice, summarytools, broom, GPArotation)
+```
+
+## Dataset
+
+```{r}
+emds0 <- read_sav("exercise motivation.sav") %>% print()
+emds <- emds0 %>% mutate_if(is.labelled, ~(as_factor(.))) %>% print()
+emdsobs1 <- emds %>% select(M1, M2, M3, M4, E1, E2, E3) %>% print()
+```
+
+# Analysis - EFA
+
+## Step 1 - RQ & Hypothesis
+
+## Step 2 - Exploration
+
+### Multivariate Normality
+
+```{r}
+mardia(emdsobs1)
+```
+
+## Step 3 - Explore factors or domain
+
+### KMO MSA
+
+```{r}
+KMO(emdsobs1)
+```
+
+### Bartlet
+
+```{r}
+cortest.bartlett(emdsobs1)
+```
+
+
+### Eigenvalue and scree plot
+
+```{r}
+emds_scree <- scree(emdsobs1) %>% print()
+```
+
+### Parallel Analysis - not in dr erica
+
+```{r}
+emds_faparallel <- fa.parallel(emdsobs1, fm="pa", fa = "fa") %>% print()
+```
+
+### vss - not in Dr Erica
+
+```{r}
+vss(emdsobs1)
+```
+
+
+
+## Step 4 - Fix no of factor
+
+```{r}
+emds_efa1 <- fa(emdsobs1, nfactors = 2, fm = "pa", rotate = "Promax") %>% print(digits = 3)
+```
+
+
+# Analysis - Cronbach Alpha
+
+```{r}
+emdsobs1
+emdsobs1_m <- emdsobs1 %>% select(M1, M2, M3, M4) %>% print()
+emdsobs1_e <- emdsobs1 %>% select(E1, E2, E3) %>% print()
+```
+
+## Overall
+
+```{r}
+emdsobs1_all_ca <- alpha(emdsobs1)
+emdsobs1_all_ca
+```
+
+## Mastery
+
+```{r}
+emdsobs1_m_ca <- alpha(emdsobs1_m)
+emdsobs1_m_ca
+```
+
+## Enjoyment
+
+```{r}
+emdsobs1_e_ca <- alpha(emdsobs1_e)
+emdsobs1_e_ca
+```
+
