@@ -141,7 +141,9 @@ not done
 ## SEM Plot
 
 ```{r}
-exermod_semplot <- semPaths(exermodparam, what = "path", whatLabels = "std", layout = "spring", edge.label.cex = 1.2, nDigits = 3, style = "lisrel", nCharNodes = 0, sizeMan = 8, sizeLat = 9, edge.color = "black")
+exermod_semplot <- semPaths(exermodparam, what = "path", whatLabels = "std", layout = "spring",
+                            edge.label.cex = 1.2, nDigits = 3, style = "lisrel", nCharNodes = 0,
+                            sizeMan = 8, sizeLat = 9, edge.color = "black")
 #png("semplot.png", width = 1024, height = 720, res = 360)
 #plot(exermod_semplot)
 #dev.off()
