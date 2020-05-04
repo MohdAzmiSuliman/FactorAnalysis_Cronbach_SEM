@@ -1,0 +1,172 @@
+---
+title: "SEM Prac"
+author: "Mohd Azmi"
+date: "26/03/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Environment
+
+## Libraries
+
+```{r}
+library(pacman)
+p_load(psych, lavaan, semTools, semPlot, haven, summarytools, tidyverse, broom)
+```
+
+## Dataset
+
+```{r}
+myds0 <- read_sav("Attitude_Statistics v3.sav") %>% zap_labels() %>% select(-ID)
+myds0 %>% descr()
+```
+
+# Correlation
+
+## Observed Variables
+
+### Q4 & Q11
+
+
+```{r}
+modlv0 <- "
+Q4 ~~ Q11
+"
+```
+
+```{r}
+cor_modlv0 <- sem(modlv0, data = myds0, meanstructure = T)
+summary(cor_modlv0, fit.measures = T, standardized = T)
+semPaths(cor_modlv0, what = "path", whatLabels = "par", edge.color = "black")
+myds0 %>% select(Q4, Q11) %>% cor()
+```
+
+## Latent Vairables
+
+```{r}
+modlv0_lat <- "
+F1 =~ Q4 + Q6 + Q7 + Q11
+F2 =~ Q8 + Q9 + Q10
+"
+```
+
+```{r}
+cor_modlv0lat <- sem(modlv0_lat, data = myds0)
+summary(cor_modlv0lat, fit.measures = T, standardized = T)
+semPaths(cor_modlv0lat, what = "path", whatLabels = "par", edge.color = "black", layout = "tree2")
+```
+
+# Causal Effect
+
+## Observed Variables
+
+### Q4 & Q11
+
+```{r}
+modcs0 <- "
+Q4 ~ Q11
+"
+```
+
+```{r}
+cs_modcs0 <- sem(modcs0, data = myds0)
+summary(cs_modcs0, fit.measures = T, standardized = T)
+lm(Q4 ~ Q11, data = myds0)
+semPaths(cs_modcs0, what = "path", whatLabels = "par", edge.color = "black", rotation = 2)
+```
+
+## Latent variables
+
+```{r}
+modcs0_lat <- "
+F1 =~ Q4 + Q6 + Q7 + Q11
+F2 =~ Q8 + Q9 + Q10
+F2 ~ F1
+"
+```
+
+
+```{r}
+cs_modcs0lat <- sem(modcs0_lat, data = myds0)
+summary(cs_modcs0lat, fit.measures = T, standardized = T)
+semPaths(cs_modcs0lat, what = "path", whatLabels = "par", edge.color = "blue", rotation = 2)
+```
+
+
+## Multiple variables
+
+```{r}
+modcs1 <- "
+Q4 ~ Q7 + Q11 + Q6
+"
+```
+
+```{r}
+cs_modcs1 <- sem(modcs1, data = myds0)
+summary(cs_modcs1, fit.measures = T, standardized = T)
+semPaths(cs_modcs1, what = "path", whatLabels = "par", edge.color = "black", rotation = 2)
+tidy(lm(Q4 ~ Q7 + Q11 + Q6, data = myds0))
+```
+
+
+
+# Mediation
+
+## Mediation Model 1
+
+```{r}
+modmed0 <- "
+Q4 ~ c*Q7 + b*Q11
+Q11 ~ a*Q7
+ab := a*b
+total := c + a*b
+"
+```
+
+```{r}
+med_modmed0 <- sem(modmed0, data = myds0)
+summary(med_modmed0, fit.measures = T, standardized = T)
+semPaths(med_modmed0, what = "path", whatLabels = "par", edge.color = "black", layout = "spring")
+```
+
+## Mediation Model 2
+
+```{r}
+modmed1 <- "
+Q4 ~ c*Q7
+"
+```
+
+```{r}
+med_modmed1 <- sem(modmed1, data = myds0)
+summary(med_modmed1, fit.measures = T, standardized = T)
+semPaths(med_modmed1, what = "path", whatLabels = "par", edge.color = "black", layout = "spring")
+```
+
+# Moderation or Interaction
+
+## Create new variables
+
+```{r}
+myds1 <- myds0 %>% mutate(Q7.Q8 = Q7*Q8)
+myds1
+```
+
+## Moderation model
+
+```{r}
+modint0 <- "
+Q4 ~ Q7 + Q8 + Q7.Q8
+"
+```
+
+```{r}
+mod_modint0 <- sem(modint0, data = myds1)
+summary(mod_modint0, fit.measures = T, standardized = T)
+semPaths(mod_modint0, what = "path", whatLabels = "par", edge.color = "black", residuals = F)
+```
+

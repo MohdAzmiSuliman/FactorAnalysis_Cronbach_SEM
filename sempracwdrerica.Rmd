@@ -1,0 +1,143 @@
+---
+title: "Dr Erica contoh"
+author: "Mohd Azmi"
+date: "26/04/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Environment
+
+## Libraries
+
+```{r}
+library(pacman)
+p_load(psych, lavaan, semTools, semPlot, haven, summarytools, tidyverse, broom)
+```
+
+## Dataset
+
+```{r}
+englishds <- read_sav("English.sav")
+englishds
+```
+
+# Correlation
+
+## Observed Variable
+
+### behaviour
+
+```{r}
+corbehav <- "
+behav01 ~~ behav03
+"
+```
+
+```{r}
+cormodbehav <- sem(corbehav, data = englishds, meanstructure = T)
+summary(cormodbehav, fit.measures = T, standardized = T)
+semPaths(cormodbehav, what = "path", whatLabels = "par", edge.color = "black")
+```
+
+### behaviour
+
+```{r}
+corasp <- "
+ed_asp ~~ occ_asp
+"
+```
+
+```{r}
+cormodasp <- sem(corasp, data = englishds, meanstructure = T)
+summary(cormodasp, fit.measures = T, standardized = T)
+semPaths(cormodasp, what = "path", whatLabels = "par", edge.color = "black")
+```
+
+## Latent Variables
+
+```{r}
+corlv <- "
+attentive =~ behav01 + behav03
+aspiration =~ ed_asp + occ_asp
+"
+```
+
+```{r}
+cor_lvmod0 <- sem(corlv, data = englishds, meanstructure = T)
+summary(cor_lvmod0, fit.measures = T, standardized = T)
+semPaths(cor_lvmod0, what = "path", whatLabels = "par", edge.color = "black", layout = "tree2")
+```
+
+# Causal Effect
+
+## Observed Variable
+
+### behaviour
+
+```{r}
+csbehav <- "
+behav01 ~ behav03
+"
+```
+
+```{r}
+csmodbehav <- sem(csbehav, data = englishds)
+summary(csmodbehav, fit.measures = T, standardized = T)
+semPaths(csmodbehav, what = "path", whatLabels = "par", edge.color = "black", rotation = 2)
+```
+
+
+## Latent Variables
+
+```{r}
+cslv <- "
+attentive =~ behav01 + behav03
+aspiration =~ ed_asp + occ_asp
+aspiration ~ attentive
+"
+```
+
+```{r}
+csmod0lv <- sem(cslv, data = englishds)
+summary(csmod0lv, fit.measures = T, standardized = T)
+semPaths(csmod0lv, what = "path", whatLabels = "par", edge.color = "black", rotation = 2)
+```
+
+# Moderation
+
+```{r}
+medmod <- "
+English ~ c*attentive + b*aspiration
+attentive =~ behav01 + behav03
+aspiration =~ ed_asp + occ_asp
+aspiration ~ a*attentive
+ab := a*b
+total := c + a*b
+"
+```
+
+```{r}
+medmodmod0 <- sem(medmod, data = englishds)
+summary(medmodmod0, fit.measures = T, standardized = T, rsquare = T, modindices = T, ci=T)
+residuals(medmodmod0, type = "standardized.mplus")
+```
+
+
+```{r}
+semPaths(medmodmod0, what = "path", whatLabels = "par", edge.color = "black", rotation = 2)
+```
+
+```{r}
+semPaths(medmodmod0, what = "path", whatLabels = "std", edge.color = "black", rotation = 2)
+```
+
+```{r}
+semPaths(medmodmod0, "path", "std", rotation = 2, edge.color = "black", edge.label.cex = 1.5, residuals = F)
+```
+
+
+
