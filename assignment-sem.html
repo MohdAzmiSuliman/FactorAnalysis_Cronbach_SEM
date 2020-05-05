@@ -1611,7 +1611,7 @@ total := c + a*b
 <div id="step-5-model-parameter-estimation" class="section level2">
 <h2><span class="header-section-number">2.6</span> Step 5: Model Parameter Estimation</h2>
 <pre class="r"><code>exermodparam &lt;- sem(exermodspec, data = exerciseds)
-summary(exermodparam, fit.measure = T, standardized = T, ci=T)</code></pre>
+summary(exermodparam, fit.measure = T, standardized = T)</code></pre>
 <pre><code>## lavaan 0.6-5 ended normally after 35 iterations
 ## 
 ##   Estimator                                         ML
@@ -1664,60 +1664,36 @@ summary(exermodparam, fit.measure = T, standardized = T, ci=T)</code></pre>
 ##   Standard errors                             Standard
 ## 
 ## Latent Variables:
-##                    Estimate  Std.Err  z-value  P(&gt;|z|) ci.lower ci.upper
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
 ##   attitude =~                                                           
-##     A1                1.000                               1.000    1.000
-##     A2                1.373    0.183    7.508    0.000    1.014    1.731
+##     A1                1.000                               0.581    0.649
+##     A2                1.373    0.183    7.508    0.000    0.797    0.810
 ##   social =~                                                             
-##     SP1               1.000                               1.000    1.000
-##     SP2               1.044    0.116    9.030    0.000    0.817    1.271
-##    Std.lv  Std.all
-##                   
-##     0.581    0.649
-##     0.797    0.810
-##                   
-##     1.401    0.739
-##     1.463    0.795
+##     SP1               1.000                               1.401    0.739
+##     SP2               1.044    0.116    9.030    0.000    1.463    0.795
 ## 
 ## Regressions:
-##                    Estimate  Std.Err  z-value  P(&gt;|z|) ci.lower ci.upper
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
 ##   Exercise ~                                                            
-##     social     (c)    0.406    0.140    2.888    0.004    0.130    0.681
-##     attitude   (b)    0.504    0.334    1.508    0.132   -0.151    1.159
+##     social     (c)    0.406    0.140    2.888    0.004    0.568    0.461
+##     attitude   (b)    0.504    0.334    1.508    0.132    0.293    0.238
 ##   attitude ~                                                            
-##     social     (a)    0.327    0.052    6.336    0.000    0.226    0.428
-##    Std.lv  Std.all
-##                   
-##     0.568    0.461
-##     0.293    0.238
-##                   
-##     0.789    0.789
+##     social     (a)    0.327    0.052    6.336    0.000    0.789    0.789
 ## 
 ## Variances:
-##                    Estimate  Std.Err  z-value  P(&gt;|z|) ci.lower ci.upper
-##    .A1                0.462    0.059    7.830    0.000    0.347    0.578
-##    .A2                0.334    0.077    4.343    0.000    0.183    0.484
-##    .SP1               1.636    0.237    6.907    0.000    1.172    2.100
-##    .SP2               1.246    0.224    5.552    0.000    0.806    1.686
-##    .Exercise          0.846    0.100    8.477    0.000    0.651    1.042
-##    .attitude          0.127    0.041    3.078    0.002    0.046    0.208
-##     social            1.963    0.363    5.401    0.000    1.251    2.676
-##    Std.lv  Std.all
-##     0.462    0.578
-##     0.334    0.344
-##     1.636    0.455
-##     1.246    0.368
-##     0.846    0.558
-##     0.377    0.377
-##     1.000    1.000
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##    .A1                0.462    0.059    7.830    0.000    0.462    0.578
+##    .A2                0.334    0.077    4.343    0.000    0.334    0.344
+##    .SP1               1.636    0.237    6.907    0.000    1.636    0.455
+##    .SP2               1.246    0.224    5.552    0.000    1.246    0.368
+##    .Exercise          0.846    0.100    8.477    0.000    0.846    0.558
+##    .attitude          0.127    0.041    3.078    0.002    0.377    0.377
+##     social            1.963    0.363    5.401    0.000    1.000    1.000
 ## 
 ## Defined Parameters:
-##                    Estimate  Std.Err  z-value  P(&gt;|z|) ci.lower ci.upper
-##     ab                0.165    0.108    1.525    0.127   -0.047    0.377
-##     total             0.570    0.074    7.737    0.000    0.426    0.715
-##    Std.lv  Std.all
-##     0.231    0.187
-##     0.799    0.649</code></pre>
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##     ab                0.165    0.108    1.525    0.127    0.231    0.187
+##     total             0.570    0.074    7.737    0.000    0.799    0.649</code></pre>
 <p>Interpretation</p>
 <p>standardized parameter</p>
 <ol style="list-style-type: decimal">
@@ -1737,7 +1713,7 @@ summary(exermodparam, fit.measure = T, standardized = T, ci=T)</code></pre>
 <li>Exercise on Attitude: 0.238</li>
 <li>Attitude on Social: 0.327</li>
 </ul>
-<p>Mediation: both direct and indirect effect was significant, thus there was partial mediation effect present</p>
+<p>Mediation: the regression coefficient between attitude on exercise was not significant, thus there was no mediation.</p>
 </div>
 <div id="step-6-assessment-of-model-fit" class="section level2">
 <h2><span class="header-section-number">2.7</span> Step 6: Assessment of Model Fit</h2>

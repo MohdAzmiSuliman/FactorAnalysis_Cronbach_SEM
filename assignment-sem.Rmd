@@ -89,7 +89,7 @@ b= no of factor loading - 1 + no of error variance + no of factor variance + no 
 
 ```{r}
 exermodparam <- sem(exermodspec, data = exerciseds)
-summary(exermodparam, fit.measure = T, standardized = T, ci=T)
+summary(exermodparam, fit.measure = T, standardized = T)
 ```
 
 Interpretation
@@ -106,7 +106,7 @@ standardized parameter
   + Exercise on Attitude: 0.238
   + Attitude on Social: 0.327
 
-Mediation: both direct and indirect effect was significant, thus there was partial mediation effect present
+Mediation: the regression coefficient between attitude on exercise was not significant, thus there was no mediation.
   
 ## Step 6: Assessment of Model Fit
 
