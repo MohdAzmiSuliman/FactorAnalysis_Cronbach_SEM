@@ -98,9 +98,32 @@ emdsobs1_all_ca
 ## Mastery
 
 ```{r}
-emdsobs1_m_ca <- alpha(emdsobs1_m)
+emdsobs1_m_ca <- psych::alpha(emdsobs1_m)
 emdsobs1_m_ca
+
+psych::smc(emdsobs1_m)
 ```
+
+alternatively
+
+```{r}
+caparam <- emdsobs1 %>% 
+  select(M1, M2, M3, M4) %>% 
+  psych::alpha()
+
+smcparam <- emdsobs1 %>% 
+  select(M1, M2, M3, M4) %>% 
+  psych::smc() %>% 
+  data.frame() 
+names(smcparam)[1] <- "smc"
+
+tibble(Item = c("M1", "M2", "M3", "M4"),
+       caparam$item.stats[5], smcparam, caparam$alpha.drop[1]) %>% 
+  rename(citr = r.drop, caidel = raw_alpha)
+
+caparam$total[1]
+```
+
 
 ## Enjoyment
 
