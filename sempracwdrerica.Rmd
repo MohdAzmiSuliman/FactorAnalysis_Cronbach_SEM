@@ -43,7 +43,7 @@ summary(cormodbehav, fit.measures = T, standardized = T)
 semPaths(cormodbehav, what = "path", whatLabels = "par", edge.color = "black")
 ```
 
-### behaviour
+### aspiration
 
 ```{r}
 corasp <- "
@@ -129,6 +129,7 @@ residuals(medmodmod0, type = "standardized.mplus")
 
 ```{r}
 semPaths(medmodmod0, what = "path", whatLabels = "par", edge.color = "black", rotation = 2)
+
 ```
 
 ```{r}
