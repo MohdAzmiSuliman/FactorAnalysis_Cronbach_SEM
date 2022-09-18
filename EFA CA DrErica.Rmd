@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+alternative: https://rpubs.com/pjmurphy/758265
+
 # Environment
 
 ## Library
